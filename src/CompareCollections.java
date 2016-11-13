@@ -20,19 +20,6 @@ import java.util.*;
 
 public class CompareCollections extends JFrame implements ActionListener {
     private JMenuBar menuBar;
-
-    private Vector<String> vector = new Vector<>();
-    private ArrayList<String> arrayList = new ArrayList<>();
-    private LinkedList<String> linkedList = new LinkedList<>();
-    private HashSet<String> hashSet = new HashSet<>();
-    private TreeSet<String> treeSet = new TreeSet<>();
-
-    private CollectionView vectorView;
-    private CollectionView arrayView;
-    private CollectionView linkedView;
-    private CollectionView hashView;
-    private CollectionView treeView;
-
     private JLabel valueLabel = new JLabel("Wartość:");
     private JTextField valueField = new JTextField(10);
     private JButton buttonAdd = new JButton("Dodaj");
@@ -40,10 +27,19 @@ public class CompareCollections extends JFrame implements ActionListener {
     private JButton buttonClear = new JButton("Wyczyść");
     private JButton buttonAbout = new JButton("Autor");
 
+    private ArrayList<Collection> collections = new ArrayList<>();
+    private ArrayList<CollectionView> collectionViews = new ArrayList<>();
+
     public CompareCollections() {
-        super("Porownanie działania kolekcji");
+        super("Porównanie działania kolekcji");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(800, 300);
+
+        collections.add(new Vector<String>());
+        collections.add(new ArrayList<String>());
+        collections.add(new LinkedList<String>());
+        collections.add(new HashSet<String>());
+        collections.add(new TreeSet<String>());
 
         JPanel panel = new JPanel();
         buttonAdd.addActionListener(this);
@@ -58,22 +54,15 @@ public class CompareCollections extends JFrame implements ActionListener {
         menuBar.add(buttonDelete);
         menuBar.add(buttonClear);
         menuBar.add(buttonAbout);
+
         setJMenuBar(menuBar);
 
-        vectorView = new CollectionView(vector, 150, 200, "vector:");
-        panel.add(vectorView);
-
-        arrayView = new CollectionView(arrayList, 150, 200, "arrayView:");
-        panel.add(arrayView);
-
-        linkedView = new CollectionView(linkedList, 150, 200, "linkedView:");
-        panel.add(linkedView);
-
-        hashView = new CollectionView(hashSet, 150, 200, "hashView:");
-        panel.add(hashView);
-        treeView = new CollectionView(treeSet, 150, 200, "treeView:");
-        panel.add(treeView);
-
+        collectionViews.add(new CollectionView(collections.get(0), 150, 200, "vector:"));
+        collectionViews.add(new CollectionView(collections.get(1), 150, 200, "arrayView:"));
+        collectionViews.add(new CollectionView(collections.get(2), 150, 200, "linkedView:"));
+        collectionViews.add(new CollectionView(collections.get(3), 150, 200, "hashView:"));
+        collectionViews.add(new CollectionView(collections.get(4), 150, 200, "treeView:"));
+        collectionViews.forEach(panel::add);
 
         setContentPane(panel);
         setVisible(true);
@@ -86,25 +75,17 @@ public class CompareCollections extends JFrame implements ActionListener {
 
         if (source == buttonAdd) {
             value = valueField.getText();
-            arrayList.add(value);
-            vector.add(value);
-            linkedList.add(value);
-            hashSet.add(value);
-            treeSet.add(value);
+            for (Collection c:collections) {
+                c.add(value);
+            }
 
         } else if (source == buttonClear) {
-            arrayList.clear();
-            vector.clear();
-            linkedList.clear();
-            hashSet.clear();
-            treeSet.clear();
+            collections.forEach(Collection::clear);
         } else if (source == buttonDelete) {
             value = valueField.getText();
-            arrayList.remove(value);
-            vector.remove(value);
-            linkedList.remove(value);
-            hashSet.remove(value);
-            treeSet.remove(value);
+            for (Collection c:collections) {
+                c.remove(value);
+            }
         } else if (source == buttonAbout) {
             About about;
             try {
@@ -114,12 +95,7 @@ public class CompareCollections extends JFrame implements ActionListener {
                 System.err.println(event.getMessage());
             }
         }
-
-        arrayView.refresh();
-        vectorView.refresh();
-        linkedView.refresh();
-        hashView.refresh();
-        treeView.refresh();
+        collectionViews.forEach(CollectionView::refresh);
     }
 
     public static void main(String[] args) {
